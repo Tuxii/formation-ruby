@@ -1,0 +1,10 @@
+<% if record.errors.any? %>
+  <div class="alert alert-danger">
+    <p class="mb-2"><strong><%= pluralize(record.errors.count, "erreur", plural: "erreurs") %> à corriger :</strong></p>
+    <ul class="mb-0">
+      <% record.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

@@ -1,0 +1,14 @@
+<% content_for :title, "Catalogue des ateliers" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h2 mb-0">Catalogue des ateliers</h1>
+  <%= link_to "Nouvel atelier", new_workshop_path, class: "btn btn-primary" %>
+</div>
+
+<% if @workshops.any? %>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="workshops">
+    <%= render @workshops %>
+  </div>
+<% else %>
+  <p class="text-muted">Aucun atelier pour l'instant.</p>
+<% end %>

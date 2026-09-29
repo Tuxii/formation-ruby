@@ -1,0 +1,16 @@
+<div class="col" id="<%= dom_id(workshop) %>">
+  <div class="card h-100">
+    <div class="card-body">
+      <h2 class="h5 card-title">
+        <%= link_to workshop.title, workshop, class: "stretched-link text-decoration-none" %>
+      </h2>
+      <p class="card-text small">
+        <%= publication_badge(workshop) %>
+        <% if workshop.formatted_duration %>
+          <span class="text-muted ms-2"><%= workshop.formatted_duration %></span>
+        <% end %>
+      </p>
+      <p class="card-text"><%= truncate(workshop.description, length: 120) %></p>
+    </div>
+  </div>
+</div>

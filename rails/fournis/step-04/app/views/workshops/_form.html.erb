@@ -1,0 +1,25 @@
+<%= form_with(model: workshop) do |form| %>
+  <%= render "shared/errors", record: workshop %>
+
+  <div class="mb-3">
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.textarea :description, rows: 4, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :duration_minutes, class: "form-label" %>
+    <%= form.number_field :duration_minutes, step: 1, class: "form-control" %>
+  </div>
+
+  <div class="form-check mb-3">
+    <%= form.checkbox :published, class: "form-check-input" %>
+    <%= form.label :published, class: "form-check-label" %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+<% end %>

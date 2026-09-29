@@ -1,0 +1,7 @@
+<% content_for :title, "Nouvel atelier" %>
+
+<h1 class="h2 mb-4">Nouvel atelier</h1>
+
+<%= render "form", workshop: @workshop %>
+
+<%= link_to "Retour au catalogue", workshops_path, class: "btn btn-link px-0 mt-3" %>
