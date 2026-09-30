@@ -47,8 +47,6 @@ C'est la convention de l'exercice 5 : sans `!`, la méthode renvoie `false` ; av
 
 Les messages sont en français sans que vous ayez rien configuré : retrouvez dans `config/` le fichier des messages et la ligne qui fixe la langue par défaut.
 
-Ajoutez enfin au modèle les méthodes `publish` et `unpublish` des exercices Ruby, telles quelles (avec `@published = true`). Elles doivent modifier l'attribut **en mémoire**, sans sauvegarder : vérifiez avec `published` et `changed?`. Que modifie `@published = true` dans un modèle ? Corrigez.
-
 > Doc : [Active Record Validations](https://guides.rubyonrails.org/active_record_validations.html)
 > Doc : [I18n - Active Record Models](https://guides.rubyonrails.org/i18n.html#active-record-models)
 
@@ -60,7 +58,7 @@ workshop.published?
 workshop.title?
 ```
 
-Vous n'avez écrit aucune de ces deux méthodes. Retrouvez qui les a définies avec `method(...).owner`, et comparez avec `workshop.method(:publish).owner`.
+Vous n'avez écrit aucune de ces deux méthodes. Retrouvez qui les a définies avec `method(...).owner`.
 
 > Doc : [ActiveRecord::AttributeMethods::Query](https://api.rubyonrails.org/classes/ActiveRecord/AttributeMethods/Query.html)
 

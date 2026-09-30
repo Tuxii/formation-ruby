@@ -1,0 +1,21 @@
+<%# Nouvelle session : POST /workshops/:workshop_id/sessions. Session existante : PATCH /sessions/:id %>
+<%= form_with(model: session.persisted? ? session : [ session.workshop, session ]) do |form| %>
+  <%= render "shared/errors", record: session %>
+
+  <div class="mb-3">
+    <%= form.label :starts_at, class: "form-label" %>
+    <%= form.datetime_field :starts_at, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :capacity, class: "form-label" %>
+    <%= form.number_field :capacity, min: 1, step: 1, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :status, class: "form-label" %>
+    <%= form.select :status, status_options, {}, class: "form-select" %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+<% end %>

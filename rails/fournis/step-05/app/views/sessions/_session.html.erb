@@ -1,0 +1,6 @@
+<tr id="<%= dom_id(session) %>">
+  <td><%= link_to l(session.starts_at, format: :short), session %></td>
+  <td><%= session.workshop.title %></td>
+  <td class="text-end"><%= session.capacity %></td>
+  <td><%= status_badge(session) %></td>
+</tr>

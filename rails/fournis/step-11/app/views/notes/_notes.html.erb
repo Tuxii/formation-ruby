@@ -1,0 +1,19 @@
+<h2 class="h4 mt-5 mb-3">Notes internes</h2>
+
+<% if notable.notes.any? %>
+  <ul class="list-group mb-3">
+    <% notable.notes.order(:created_at).each do |note| %>
+      <li class="list-group-item">
+        <%= note.body %>
+        <small class="text-muted d-block"><%= l(note.created_at, format: :short) %></small>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="text-muted">Aucune note pour l'instant.</p>
+<% end %>
+
+<%= form_with model: [ notable, Note.new ], class: "d-flex gap-2" do |form| %>
+  <%= form.text_field :body, placeholder: "Ajouter une note", required: true, class: "form-control" %>
+  <%= form.submit "Ajouter", class: "btn btn-outline-primary" %>
+<% end %>

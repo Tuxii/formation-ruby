@@ -1,0 +1,11 @@
+alice:
+  name: Alice Martin
+  email: alice@example.test
+
+bruno:
+  name: Bruno Bernard
+  email: bruno@example.test
+
+chloe:
+  name: Chloé Dubois
+  email: chloe@example.test

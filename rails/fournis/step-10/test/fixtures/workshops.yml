@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+ceramics:
+  title: Initiation à la céramique
+  description: Modelage à la main et premier passage au tour.
+  duration_minutes: 120
+  published: true
+
+bike:
+  title: Réparer son vélo
+  description: Crevaison, freins, dérailleur.
+  duration_minutes: 90
+  published: false

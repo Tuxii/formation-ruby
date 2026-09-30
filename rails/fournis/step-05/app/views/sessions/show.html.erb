@@ -1,0 +1,27 @@
+<% content_for :title, "#{@session.workshop.title}, #{l(@session.starts_at, format: :short)}" %>
+
+<nav aria-label="Fil d'Ariane">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><%= link_to "Catalogue", workshops_path %></li>
+    <li class="breadcrumb-item"><%= link_to @session.workshop.title, @session.workshop %></li>
+    <li class="breadcrumb-item active" aria-current="page"><%= l(@session.starts_at, format: :short) %></li>
+  </ol>
+</nav>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+  <h1 class="h2 mb-0"><%= @session.workshop.title %></h1>
+  <%= status_badge(@session) %>
+</div>
+
+<dl class="row">
+  <dt class="col-sm-3">Début</dt>
+  <dd class="col-sm-9"><%= l(@session.starts_at, format: :long) %></dd>
+
+  <dt class="col-sm-3">Capacité</dt>
+  <dd class="col-sm-9"><%= pluralize(@session.capacity, "place", plural: "places") %></dd>
+</dl>
+
+<div class="d-flex gap-2 mt-4">
+  <%= link_to "Modifier", edit_session_path(@session), class: "btn btn-outline-secondary" %>
+  <%= button_to "Supprimer", @session, method: :delete, class: "btn btn-outline-danger" %>
+</div>

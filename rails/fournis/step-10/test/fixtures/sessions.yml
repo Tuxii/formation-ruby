@@ -1,0 +1,18 @@
+# 3 places, dont une déjà prise par Alice (voir registrations.yml)
+ceramics_saturday:
+  workshop: ceramics
+  starts_at: <%= 1.week.from_now %>
+  capacity: 3
+  status: published
+
+ceramics_draft:
+  workshop: ceramics
+  starts_at: <%= 2.weeks.from_now %>
+  capacity: 8
+  status: draft
+
+bike_past:
+  workshop: bike
+  starts_at: <%= 1.week.ago %>
+  capacity: 12
+  status: published

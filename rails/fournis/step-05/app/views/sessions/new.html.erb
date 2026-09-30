@@ -1,0 +1,8 @@
+<% content_for :title, "Programmer une session" %>
+
+<h1 class="h2 mb-1">Programmer une session</h1>
+<p class="text-muted mb-4"><%= @session.workshop.title %></p>
+
+<%= render "form", session: @session %>
+
+<%= link_to "Retour à l'atelier", @session.workshop, class: "btn btn-link px-0 mt-3" %>
