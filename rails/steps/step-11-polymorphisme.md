@@ -6,6 +6,7 @@
 
 - Relier un modèle à plusieurs autres avec une association polymorphe
 - Écrire un contrôleur et un partial qui servent à deux modèles
+- Partager du code entre deux modèles avec un concern
 
 ## 11.1 Une table pour deux modèles
 
@@ -117,3 +118,44 @@ Ajoutez une note sur un atelier, puis sur une session. Le formulaire du partial 
 ## 11.4 Ce que la base ne garantit plus
 
 Dans `registrations`, `session_id` a une clé étrangère : la base refuse une inscription vers une session qui n'existe pas. Pour `notes.notable_id`, impossible : la colonne pointe tantôt vers `workshops`, tantôt vers `sessions`. C'est `dependent: :destroy` qui supprime les notes avec leur atelier : l'intégrité repose sur le code.
+
+## 11.5 La même ligne dans deux modèles : un concern
+
+`Workshop` et `Session` contiennent la même ligne, `has_many :notes, as: :notable, dependent: :destroy`. Un troisième modèle à annoter la recopierait encore. Rails range ce code partagé dans un **concern** : un module, comme ceux de l'exercice Ruby 3, placé dans `app/models/concerns/`.
+
+Créez `app/models/concerns/notable.rb` :
+
+```ruby
+module Notable
+  extend ActiveSupport::Concern
+
+  included do
+    has_many :notes, as: :notable, dependent: :destroy
+  end
+end
+```
+
+Dans `Workshop` et dans `Session`, remplacez la ligne `has_many :notes, ...` par :
+
+```ruby
+include Notable
+```
+
+`has_many` est une méthode de classe : elle doit s'exécuter dans la classe qui inclut le module, pas dans le module lui-même. C'est le rôle de `included do` : son bloc s'exécute dans `Workshop`, puis dans `Session`, au moment du `include`.
+
+Vérifiez en console, après `reload!`, puis relancez les tests :
+
+```ruby
+Workshop.include?(Notable)
+Workshop.ancestors.first(3)
+Workshop.first.notes
+Session.first.notes
+```
+
+```bash
+bin/rails test
+```
+
+Les pages d'un atelier et d'une session affichent toujours leurs notes : rien n'a changé pour l'utilisateur, le code n'est plus écrit qu'une fois.
+
+> Doc : [ActiveSupport::Concern](https://api.rubyonrails.org/classes/ActiveSupport/Concern.html)
