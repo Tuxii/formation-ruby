@@ -1,6 +1,6 @@
-# Step 13 - Turbo Streams : s'inscrire sans recharger la page
+# Step 14 - Turbo Streams : s'inscrire sans recharger la page
 
-> **Départ** : la fin du step 12 (ou `origin/step-12`) · **Fichiers fournis** : aucun · **Solution** : `origin/step-13`
+> **Départ** : la fin du step 13 (ou `origin/step-13`) · **Fichiers fournis** : aucun · **Solution** : `origin/step-14`
 
 ## Objectifs
 
@@ -9,7 +9,7 @@
 - Connaître les actions `append`, `update`, `replace` et `remove`
 - Mettre à jour les autres navigateurs ouverts sur la même page
 
-## 13.1 Plusieurs zones à mettre à jour
+## 14.1 Plusieurs zones à mettre à jour
 
 Une inscription redirige vers la session, et toute la page est redessinée. Pourtant, seules quatre zones changent : la liste des inscrits, les places restantes, le badge de statut (la session peut devenir complète) et le formulaire (vidé, ou remplacé par « Plus aucune place disponible. »).
 
@@ -17,50 +17,37 @@ Un frame remplace **une** zone. Un Turbo Stream est une réponse faite d'une lis
 
 > Doc : [Turbo Streams](https://turbo.hotwired.dev/handbook/streams)
 
-## 13.2 Des cibles
+## 14.2 Des cibles
 
-Donnez un `id` aux quatre zones, dans `app/views/sessions/show.html.erb` :
+**À vous.** Donnez un `id` aux quatre zones, dans `app/views/sessions/show.html.erb` :
 
 - les places restantes : `<dd class="col-sm-9" id="remaining_seats">`
 - le badge : `<span id="status_badge"><%= status_badge(@session) %></span>`
 - la liste : `<tbody id="registrations">`. Retirez le `if` / `else` qui entoure le tableau : il est toujours affiché, même vide, pour que la cible existe.
-- le formulaire : déplacez le `if` / `else` du step 07 dans le partial `registrations/_form.html.erb`, le tout dans un `<div id="registration_form">`. Dans `show.html.erb`, il ne reste que `<%= render "registrations/form", session: @session %>`.
-
-Le partial devient :
-
-```erb
-<div id="registration_form">
-  <% if session.remaining_seats.positive? %>
-    <%= form_with model: Participant.new, ... do |form| %>
-      ...
-    <% end %>
-  <% else %>
-    <p class="text-muted">Plus aucune place disponible.</p>
-  <% end %>
-</div>
-```
+- le formulaire : déplacez le `if` / `else` du step 07 dans le partial `registrations/_form.html.erb`, le tout dans un `<div id="registration_form">`. Dans `show.html.erb`, il ne reste que `<%= render "registrations/form", session: @session %>`. Dans le partial, la session s'appelle `session`, pas `@session`.
 
 Rechargez la page d'une session : rien n'a changé à l'écran.
 
-## 13.3 La réponse en stream
+## 14.3 La réponse en stream
 
-Dans `RegistrationsController#create`, remplacez la redirection du succès par :
+Pour un emprunt de livre, le contrôleur répond en stream quand la requête vient de Turbo, et garde la redirection pour les autres (les tests, un navigateur sans JavaScript) :
 
 ```ruby
+# LoansController#create, en cas de succès
 respond_to do |format|
   format.turbo_stream
-  format.html { redirect_to @session, notice: "Inscription de #{@participant.name} enregistrée." }
+  format.html { redirect_to @book, notice: "Emprunt enregistré." }
 end
 ```
 
-`format.turbo_stream` sans bloc rend le template `create.turbo_stream.erb`. Créez `app/views/registrations/create.turbo_stream.erb` :
+`format.turbo_stream` sans bloc rend le template `create.turbo_stream.erb`, qui contient les instructions :
 
 ```erb
-<%= turbo_stream.append "registrations", @registration %>
-<%= turbo_stream.update "remaining_seats", @session.remaining_seats %>
+<%# app/views/loans/create.turbo_stream.erb %>
+<%= turbo_stream.append "loans", @loan %>
+<%= turbo_stream.update "available_copies", @book.available_copies %>
+<%= turbo_stream.replace "loan_form", partial: "loans/form", locals: { book: @book } %>
 ```
-
-Inscrivez quelqu'un : la ligne apparaît dans la liste, le compteur baisse, et la page n'est pas rechargée. Dans l'onglet Réseau, lisez la réponse : du HTML, découpé en balises `<turbo-stream action="..." target="...">`.
 
 | Action | Effet |
 | --- | --- |
@@ -69,20 +56,22 @@ Inscrivez quelqu'un : la ligne apparaît dans la liste, le compteur baisse, et l
 | `replace` | remplace la cible elle-même, balise comprise |
 | `remove` | supprime la cible |
 
-`turbo_stream.append "registrations", @registration` rend le partial `registrations/_registration` : la convention du step 04.
+`turbo_stream.append "loans", @loan` rend le partial `loans/_loan` : la convention du step 04.
 
-**À vous.** Le formulaire garde la saisie et le badge ne change pas. Ajoutez deux instructions au template :
+**À vous.** Dans `RegistrationsController#create`, remplacez la redirection du succès par un `respond_to`, puis écrivez `app/views/registrations/create.turbo_stream.erb` avec quatre instructions :
 
-- mettre à jour le badge, avec le helper `status_badge(@session)`
-- remplacer le formulaire par le partial rendu à nouveau : `turbo_stream.replace "registration_form", partial: "registrations/form", locals: { session: @session }`
+1. ajouter l'inscription à la fin de `registrations`
+2. mettre à jour `remaining_seats` avec `@session.remaining_seats`
+3. mettre à jour `status_badge` avec `status_badge(@session)`
+4. remplacer `registration_form` par le partial du formulaire, rendu à nouveau
 
-Vérifiez : le formulaire se vide après une inscription. Prenez la dernière place d'une session : le badge passe à « Complète » et le formulaire laisse la place au message.
+Inscrivez quelqu'un : la ligne apparaît, le compteur baisse, le formulaire se vide, et la page n'est pas rechargée. Prenez la dernière place d'une session : le badge passe à « Complète » et le formulaire laisse la place au message. Dans l'onglet Réseau, lisez la réponse : du HTML, découpé en balises `<turbo-stream action="..." target="...">`.
 
-`format.html` sert aux requêtes qui ne passent pas par Turbo : les tests du step 10 reçoivent toujours la redirection. Relancez `bin/rails test`.
+Relancez `bin/rails test` : les tests ne passent pas par Turbo et reçoivent toujours la redirection.
 
 > Doc : [Streaming From HTTP Responses](https://turbo.hotwired.dev/handbook/streams#streaming-from-http-responses)
 
-## 13.4 À vous : la désinscription
+## 14.4 À vous : la désinscription
 
 **À vous.** Même traitement pour `destroy` :
 
@@ -92,7 +81,7 @@ Vérifiez : le formulaire se vide après une inscription. Prenez la dernière pl
 
 Vérifiez sur une session complète : désinscrivez quelqu'un, la ligne disparaît, le badge repasse à « Publiée », le formulaire revient.
 
-## 13.5 La seconde fenêtre
+## 14.5 La seconde fenêtre
 
 Ouvrez la même session dans **deux fenêtres** côte à côte. Inscrivez quelqu'un dans la première : la seconde ne bouge pas, elle n'a rien demandé. Pour la prévenir, le serveur doit lui **pousser** le changement, par une connexion qui reste ouverte (un WebSocket, géré par Action Cable).
 

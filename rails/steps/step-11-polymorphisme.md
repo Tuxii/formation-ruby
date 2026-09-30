@@ -30,13 +30,17 @@ Lisez la table `notes` dans `db/schema.rb` : deux colonnes, `notable_type` (le n
 
 Le générateur a écrit `belongs_to :notable, polymorphic: true` dans `Note`. Ajoutez une validation de présence sur `body`.
 
-Dans `Workshop` **et** dans `Session` :
+De l'autre côté, chaque modèle qui peut recevoir des notes déclare un `has_many` avec l'option `as:`. Par exemple, pour des avis sur des livres :
 
 ```ruby
-has_many :notes, as: :notable, dependent: :destroy
+class Book < ApplicationRecord
+  has_many :reviews, as: :reviewable, dependent: :destroy
+end
 ```
 
-`as: :notable` dit à Rails de chercher les notes par les deux colonnes. En console :
+`as: :reviewable` dit à Rails de chercher les avis par les deux colonnes, `reviewable_type` et `reviewable_id`.
+
+**À vous.** Déclarez les notes dans `Workshop` **et** dans `Session`, supprimées avec eux. Puis en console :
 
 ```ruby
 workshop = Workshop.first
@@ -123,25 +127,27 @@ Dans `registrations`, `session_id` a une clé étrangère : la base refuse une i
 
 `Workshop` et `Session` contiennent la même ligne, `has_many :notes, as: :notable, dependent: :destroy`. Un troisième modèle à annoter la recopierait encore. Rails range ce code partagé dans un **concern** : un module, comme ceux de l'exercice Ruby 3, placé dans `app/models/concerns/`.
 
-Créez `app/models/concerns/notable.rb` :
+Un concern, pour les avis des livres et des auteurs :
 
 ```ruby
-module Notable
+# app/models/concerns/reviewable.rb
+module Reviewable
   extend ActiveSupport::Concern
 
   included do
-    has_many :notes, as: :notable, dependent: :destroy
+    has_many :reviews, as: :reviewable, dependent: :destroy
   end
+end
+
+# app/models/book.rb, et de même dans app/models/author.rb
+class Book < ApplicationRecord
+  include Reviewable
 end
 ```
 
-Dans `Workshop` et dans `Session`, remplacez la ligne `has_many :notes, ...` par :
+`has_many` est une méthode de classe : elle doit s'exécuter dans la classe qui inclut le module, pas dans le module lui-même. C'est le rôle de `included do` : son bloc s'exécute dans chaque classe, au moment du `include`.
 
-```ruby
-include Notable
-```
-
-`has_many` est une méthode de classe : elle doit s'exécuter dans la classe qui inclut le module, pas dans le module lui-même. C'est le rôle de `included do` : son bloc s'exécute dans `Workshop`, puis dans `Session`, au moment du `include`.
+**À vous.** Écrivez le concern `Notable` dans `app/models/concerns/notable.rb`, et remplacez la ligne `has_many :notes, ...` de `Workshop` et de `Session` par `include Notable`.
 
 Vérifiez en console, après `reload!`, puis relancez les tests :
 

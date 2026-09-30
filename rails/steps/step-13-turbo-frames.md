@@ -1,6 +1,6 @@
-# Step 12 - Turbo Frames : modifier sur place
+# Step 13 - Turbo Frames : modifier sur place
 
-> **Départ** : la fin du step 11 (ou `origin/step-11`) · **Fichiers fournis** : aucun · **Solution** : `origin/step-12`
+> **Départ** : la fin du step 12 (ou `origin/step-12`) · **Fichiers fournis** : aucun · **Solution** : `origin/step-13`
 
 ## Objectifs
 
@@ -9,7 +9,7 @@
 - Modifier un enregistrement sans quitter sa page
 - Savoir sortir d'un frame
 
-## 12.1 Turbo Drive est déjà là
+## 13.1 Turbo Drive est déjà là
 
 Ouvrez les outils de développement du navigateur, onglet Réseau, filtre « Fetch/XHR ». Naviguez entre le catalogue, un atelier et une session : chaque clic est une requête `fetch`, la page n'est jamais rechargée en entier.
 
@@ -21,45 +21,43 @@ Après l'envoi d'un formulaire, Turbo attend une redirection (le succès) ou un 
 
 > Doc : [Turbo Drive - Form Submissions](https://turbo.hotwired.dev/handbook/drive#form-submissions)
 
-## 12.2 Modifier une session sur place
+## 13.2 Modifier une session sur place
 
 Pour changer la capacité d'une session, on quitte sa page, on modifie, on revient. On veut que le formulaire apparaisse **à la place** des informations, sans quitter la page.
 
-Dans `app/views/sessions/show.html.erb`, entourez le titre, le badge et la liste `<dl>` d'un frame, et déplacez-y le lien « Modifier », qui était en bas de page :
+Un Turbo Frame est une zone délimitée par `turbo_frame_tag`. Pour un livre :
 
 ```erb
-<%= turbo_frame_tag "session_details" do %>
-  <div class="d-flex align-items-center gap-3 mb-3">
-    ...
-  </div>
+<%# app/views/books/show.html.erb %>
+<%= turbo_frame_tag "book_details" do %>
+  <h1><%= @book.title %></h1>
+  <p><%= pluralize(@book.copies, "exemplaire", plural: "exemplaires") %></p>
 
-  <dl class="row">
-    ...
-  </dl>
+  <%= link_to "Modifier", edit_book_path(@book) %>
+<% end %>
 
-  <%= link_to "Modifier", edit_session_path(@session), class: "btn btn-outline-secondary btn-sm" %>
+<%# app/views/books/edit.html.erb : un frame du même nom %>
+<%= turbo_frame_tag "book_details" do %>
+  <%= render "form", book: @book %>
+
+  <%= link_to "Annuler", @book %>
 <% end %>
 ```
 
-Dans `app/views/sessions/edit.html.erb`, entourez le formulaire d'un frame **du même nom**, et remplacez le lien de retour par un lien « Annuler » placé dans le frame :
+Un lien ou un formulaire placé **dans** un frame ne change pas de page : Turbo fait la requête, cherche dans la réponse le frame qui porte le même `id`, et remplace le contenu du frame affiché par le sien. Le reste de la réponse est ignoré, et le contrôleur ne change pas.
 
-```erb
-<%= turbo_frame_tag "session_details" do %>
-  <%= render "form", session: @session %>
+**À vous.** Faites-le pour la page d'une session, avec un frame `session_details` :
 
-  <%= link_to "Annuler", @session, class: "btn btn-link px-0 mt-3" %>
-<% end %>
-```
+- dans `sessions/show.html.erb`, le frame entoure le titre, le badge et la liste `<dl>`, et le lien « Modifier » passe dans le frame, sous la liste
+- dans `sessions/edit.html.erb`, le même frame entoure le formulaire, avec un lien « Annuler » vers la session à la place du lien de retour
 
-Sur la page d'une session, cliquez sur « Modifier » : le formulaire prend la place des informations, le reste de la page ne bouge pas. Changez la capacité et enregistrez. Recommencez en vidant la date : l'erreur s'affiche sur place. « Annuler » ramène les informations.
-
-Le contrôleur n'a pas changé. Un lien ou un formulaire placé **dans** un `<turbo-frame>` ne change pas de page : Turbo fait la requête, cherche dans la réponse un `<turbo-frame>` qui porte le même `id`, et remplace le contenu du frame par le sien. Le reste de la réponse est ignoré. Dans l'onglet Réseau, la requête porte un en-tête `Turbo-Frame: session_details`.
+Cliquez sur « Modifier » : le formulaire prend la place des informations, le reste de la page ne bouge pas. Changez la capacité et enregistrez. Recommencez en vidant la date : l'erreur s'affiche sur place. Dans l'onglet Réseau, la requête porte un en-tête `Turbo-Frame: session_details`.
 
 Le message « Session mise à jour. » ne s'affiche plus : il est rendu par le layout, hors du frame.
 
 > Doc : [Turbo Frames](https://turbo.hotwired.dev/handbook/frames)
 
-## 12.3 Sortir du frame
+## 13.3 Sortir du frame
 
 Dans le frame de `sessions/show.html.erb`, à côté de « Modifier », ajoutez un lien vers l'atelier :
 
@@ -73,17 +71,17 @@ Cliquez : « Content missing ». La page de l'atelier ne contient pas de frame `
 data: { turbo_frame: "_top" }
 ```
 
-Tout ce qui est dans un frame reste dans le frame, sauf indication contraire. C'est pour cela que le bouton « Supprimer » est resté en dehors.
+Tout ce qui est dans un frame reste dans le frame, sauf indication contraire. C'est pour cela que le bouton « Supprimer » reste en dehors.
 
 > Doc : [Targeting Navigation Into or Out of a Frame](https://turbo.hotwired.dev/handbook/frames#targeting-navigation-into-or-out-of-a-frame)
 
-## 12.4 À vous : un atelier sur place
+## 13.4 À vous : un atelier sur place
 
 **À vous.** Faites la même chose pour les ateliers, avec un frame `workshop_details` :
 
-- dans `workshops/show.html.erb`, le frame entoure le titre, le badge, la durée, le nombre de participants et la description, avec le lien « Modifier » à l'intérieur
+- dans `workshops/show.html.erb`, le frame entoure le titre, le badge, la durée, le nombre de participants, la description et le lien de téléchargement du support, avec le lien « Modifier » à l'intérieur
 - dans `workshops/edit.html.erb`, le même frame entoure le formulaire, avec un lien « Annuler »
 
-Vérifiez : modifiez le titre d'un atelier sans quitter sa page, puis essayez un titre de deux caractères.
+Vérifiez : modifiez le titre d'un atelier sans quitter sa page, puis essayez un titre de deux caractères. Joignez un support PDF depuis le frame : le lien de téléchargement apparaît sans recharger la page.
 
-Après la modification du titre, regardez le fil d'Ariane, en haut de la page : il affiche encore l'ancien. Un frame ne met à jour que lui-même. Pour mettre à jour plusieurs zones en une seule réponse, il faut les Turbo Streams du step 13.
+Après la modification du titre, regardez le fil d'Ariane, en haut de la page : il affiche encore l'ancien. Un frame ne met à jour que lui-même. Pour mettre à jour plusieurs zones en une seule réponse, il faut les Turbo Streams du step 14.
