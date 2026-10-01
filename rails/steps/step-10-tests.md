@@ -80,8 +80,6 @@ Cassez ensuite `formatted_duration` exprès (retirez le `rjust`, ajoutez un cas 
 bin/rails test test/models/registration_test.rb
 ```
 
-Si vous avez le temps : un test « la dernière place passe la session à complète » (le callback du step 08). Pour relire l'état en base : `session.reload.full?`.
-
 ## 10.5 Un test d'intégration
 
 Un test d'intégration envoie de vraies requêtes à l'application, comme un formulaire :

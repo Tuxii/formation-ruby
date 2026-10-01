@@ -107,9 +107,3 @@ Tapez une note : le compteur suit chaque frappe. Ajoutez-la : après le recharge
 
 > Doc : [Targets](https://stimulus.hotwired.dev/reference/targets)
 > Doc : [Lifecycle Callbacks](https://stimulus.hotwired.dev/reference/lifecycle-callbacks)
-
-## 15.4 Pour aller plus loin
-
-Sur la page d'une session, un bouton « Copier les emails » qui place les emails des inscrits dans le presse-papiers : `navigator.clipboard.writeText(texte)`. Le texte à copier peut être passé au contrôleur par une **value**, `data-clipboard-text-value="..."`, lue avec `static values = { text: String }` et `this.textValue`.
-
-> Doc : [Values](https://stimulus.hotwired.dev/reference/values)
