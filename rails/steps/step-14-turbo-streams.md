@@ -8,6 +8,7 @@
 - Répondre en `turbo_stream` depuis un contrôleur, en gardant une réponse HTML de repli
 - Connaître les actions `append`, `update`, `replace` et `remove`
 - Mettre à jour les autres navigateurs ouverts sur la même page
+- Savoir ce que le morphing change à un rafraîchissement
 
 ## 14.1 Plusieurs zones à mettre à jour
 
@@ -102,3 +103,23 @@ Rechargez les deux fenêtres, puis inscrivez et désinscrivez quelqu'un dans la 
 `broadcasts_refreshes_to` pose des callbacks `after_commit` sur le modèle : le mécanisme du step 08.
 
 > Doc : [Broadcasting Page Refreshes](https://turbo.hotwired.dev/handbook/page_refreshes#broadcasting-page-refreshes)
+
+## 14.6 Le morphing
+
+Dans la seconde fenêtre, faites défiler la page jusqu'à la liste des inscrits, puis inscrivez quelqu'un depuis la première : la seconde remonte en haut. Le `refresh` a remplacé toute la page.
+
+En haut de `sessions/show.html.erb`, ajoutez :
+
+```erb
+<% content_for :head do %>
+  <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+<% end %>
+```
+
+Le layout place ce contenu dans le `<head>` (`<%= yield :head %>`). Recommencez : la seconde fenêtre ne bouge plus. Avec le **morphing**, Turbo compare la nouvelle page avec celle affichée et ne modifie que ce qui a changé ; `scroll: :preserve` garde la position de défilement.
+
+C'est l'approche inverse des streams du 14.3 : au lieu d'écrire une instruction par zone, le serveur renvoie la page entière et Turbo calcule la différence. Moins précis, beaucoup plus court à écrire.
+
+Le morphing aligne la page sur celle du serveur : tapez une note dans la seconde fenêtre sans l'envoyer, puis inscrivez quelqu'un dans la première. La saisie est perdue.
+
+> Doc : [Page Refreshes](https://turbo.hotwired.dev/handbook/page_refreshes)
